@@ -1,0 +1,33 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+
+class SalarySetupTableSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        \Illuminate\Support\Facades\DB::table('salary_setups')->insert([
+            [
+                'transaction_id' => \App\TransactionId\Transaction::setTransactionId(),
+                'account_type' => 'Salary Payable',
+            ], [
+                'transaction_id' => \App\TransactionId\Transaction::setTransactionId(),
+                'account_type' => 'Salary Receivable',
+            ],
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('purchase_setups')->insert([
+            [
+                'transaction_id' => \App\TransactionId\Transaction::setTransactionId(),
+                'account_type' => 'Purchase Tax Account',
+            ], 
+        ]);
+    }
+}
