@@ -2,12 +2,6 @@
 
 @section("page-content")
 
-@if(session()->has('message'))
-    <div class="alert alert-success">
-        {{ session()->get('message') }}
-    </div>
-@endif
-
 <section class="content">
     <div class="card-header">
         <h3 class="card-title"><b>Petty Cash <small>  Setup</small></b></h3>

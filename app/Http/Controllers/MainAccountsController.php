@@ -106,17 +106,14 @@ class MainAccountsController extends Controller
                         ->select('main_accounts.account_name as mainAccountName','sub_accounts.*')
                         ->orderby('main_accounts.id')->get();
 
-        $accounts = SubAccounts::leftjoin('main_accounts','main_accounts.account_id','sub_accounts.parent_account_id')
-        ->select(DB::raw("CONCAT(sub_accounts.account_name,'(',main_accounts.account_name,')') AS label"),'sub_accounts.transaction_id as value')
-        ->where('degree',AccountType::Normal)
-        ->get();
+        $accounts = MainAccounts::all();
 
         return view('subAccounts',['name'=>$name,'subAccounts'=>$subAccounts,'accounts'=>$accounts]);
     }
 
     public function storeSubAccounts(Request $request)
     {
-         this->validate(request(), [
+         $this->validate(request(), [
             'accountName' => 'required',
             'mainAccountId' => 'required',
             'accountCode' => 'required',
@@ -130,6 +127,7 @@ class MainAccountsController extends Controller
             $subAccount->parent_account_id = $request->mainAccountId;
             $subAccount->account_code =$request->accountCode;
             $subAccount->balance_amount = $request->accountBalance;
+            $subAccount->degree = 1;
             $subAccount->save();
             
             return redirect('subAccounts')->with('message', 'Created SubAccount Successfully!');                 

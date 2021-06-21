@@ -110,7 +110,7 @@ class PurchaseController extends Controller
         ->where('degree',AccountType::Normal)
         ->get();
 
-        $name = Auth::user()->name;
+        $name = Auth::user()->user_name;
 
         return view('purchase.purchaseEntry',['name'=>$name,'vendor'=>$vendor,'accounts'=>$accounts]);
     }

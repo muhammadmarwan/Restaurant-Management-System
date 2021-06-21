@@ -84,7 +84,7 @@
                   <select class="form-control select2" style="width: 100%;" name="mainAccountId">
                     <option selected disabled>Choose here</option>
                     @foreach($accounts as $value)
-                    <option value="{{$value->value}}">{{$value->label}}</option>
+                    <option value="{{$value->account_id}}">{{$value->account_name}}</option>
                     @endforeach
                   </select>
                   </div>
