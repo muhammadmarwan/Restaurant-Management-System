@@ -5,10 +5,10 @@
           <h1>Demo Items</h1>
           <table class="table table-sm">
             <thead>
-              <td style="font-size: 13px;" width="80%"><strong>Items</td>
-              <td style="font-size: 13px;"><strong>Qty</td>
-              <td style="font-size: 13px;"><strong>Unit Price</td>
-              <td style="font-size: 13px;"><b>Total Amount</b></td>
+              <td style="font-size: 13px;width:20%" width="80%"><strong>Items</td>
+              <td style="font-size: 13px;" class="text-right"><strong>Qty</td>
+              <td style="font-size: 13px;" class="text-right"><strong>Price</td>
+              <td style="font-size: 13px;" class="text-right"><b>Total</b></td>
               <td></td>
             </thead>
             <tbody>

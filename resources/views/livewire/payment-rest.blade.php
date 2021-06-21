@@ -11,7 +11,7 @@
         <div class="row">
             <select class="form-control text-center" name="tokenNumber" placeholder="Enter Token Number Or Barcode"
               wire:model="billCode">
-              <option selected >---------------------------Select Bill----------------------------</option>
+              <option selected >---------------------Select Bill----------------------------</option>
             @foreach($saleDataList as $val)
               <option label="{{$val->data}}" value="{{$val->bill_no}}">
             @endforeach 

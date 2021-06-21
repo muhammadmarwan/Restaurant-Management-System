@@ -41,11 +41,11 @@ class ReceiptPrinter
 
     public function init($connector_type, $connector_descriptor, $connector_port = 9100) {
 
-        // $pc = gethostbyaddr($_SERVER['REMOTE_ADDR']);
+        $pc = gethostbyaddr($_SERVER['REMOTE_ADDR']);
 
         // $connector = new WindowsPrintConnector("smb://LAPTOP-LSIQVUUQ/SGT-88IV");
 
-        $connector = new WindowsPrintConnector("smb://192.168.80.180/Printer123");
+        $connector = new WindowsPrintConnector("smb://192.168.0.1/SGT-88IV");
 
         // $connector = new NetworkPrintConnector("192.168.80.114", 9100);
         
