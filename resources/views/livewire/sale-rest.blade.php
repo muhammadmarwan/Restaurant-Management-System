@@ -2,10 +2,10 @@
     <div class="row">
       <div class="col-3 px-1 bg-dark position-fixed" id="sticky-sidebar">
         <div class="nav flex-column flex-nowrap vh-100 overflow-auto text-white p-2">
-          <h1>Demo Items</h1>
+          <h1>XXXXXXXXXX</h1>
           <table class="table table-sm">
             <thead>
-              <td style="font-size: 13px;width:20%" width="80%"><strong>Items</td>
+              <td style="font-size: 13px;width:50%" width="80%"><strong>Items</td>
               <td style="font-size: 13px;" class="text-right"><strong>Qty</td>
               <td style="font-size: 13px;" class="text-right"><strong>Price</td>
               <td style="font-size: 13px;" class="text-right"><b>Total</b></td>
@@ -41,10 +41,10 @@
           </table>
           <table class="table table-dark">
             <tr>
-              <th><button type="submit" class="btn btn-warning btn-sm" 
+              <th><button type="submit" class="btn btn-danger btn-sm" 
               data-toggle="modal" data-target="#tableSelect1">DINE IN</button></th>
-              <th><a href="{{ Route('takeAway') }}"><button type="submit" class="btn btn-warning btn-sm">TAKE AWAY</button></a></th>
-              <th><button type="submit" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#delivery">
+              <th><a href="{{ Route('takeAway') }}"><button type="submit" class="btn btn-danger btn-sm">TAKE AWAY</button></a></th>
+              <th><button type="submit" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delivery">
               DELIVERY  .</button></th>
             </tr>
           </table>
@@ -133,7 +133,6 @@
                   @else
                     <a class="nav-link" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#custom-tabs-three-profile" role="tab" aria-controls="custom-tabs-three-profile" aria-selected="false">Main Items</a>
                   @endif  
-
                   </li>
                   <li class="nav-item">
                   @if($tabId==3)
@@ -154,7 +153,7 @@
                   <div class="row">
                   @foreach($normal as $val)
                     <div class="col-md-2">
-                      <div style="height:110px" class="card card-body bg-success itemCard mh-110" wire:click="InsertoCart({{$val->itemId}})">
+                      <div style="height:110px" class="card card-body bg-danger itemCard mh-110" wire:click="InsertoCart({{$val->itemId}})">
                         @if($val->item_name==null)
                             <h4>XXXX</h4>
                             <br>
@@ -171,11 +170,10 @@
                   @else
                   <div class="tab-pane fade show" id="custom-tabs-three-profile" role="tabpanel" aria-labelledby="custom-tabs-three-profile-tab">
                   @endif
-                  
                   <div class="row">
                   @foreach($main as $val)
                     <div class="col-md-2">
-                      <div style="height:110px" class="card card-body bg-warning itemCard" wire:click="InsertoCart({{$val->itemId}})">
+                      <div style="height:110px" class="card card-body bg-success itemCard" wire:click="InsertoCart({{$val->itemId}})">
                         @if($val->item_name==null)
                             <h4>XXXX</h4>
                             <br>
@@ -195,7 +193,7 @@
                   <div class="row">
                   @foreach($extra as $val)
                     <div class="col-md-2">
-                      <div style="height:110px" class="card card-body bg-danger itemCard" wire:click="InsertoCart({{$val->itemId}})">
+                      <div style="height:110px" class="card card-body bg-warning itemCard" wire:click="InsertoCart({{$val->itemId}})">
                         @if($val->item_name==null)
                             <h4>XXXX</h4>
                             <br>

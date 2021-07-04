@@ -43,9 +43,9 @@ class ReceiptPrinter
 
         $pc = gethostbyaddr($_SERVER['REMOTE_ADDR']);
 
-        // $connector = new WindowsPrintConnector("smb://LAPTOP-LSIQVUUQ/SGT-88IV");
+        $connector = new WindowsPrintConnector("smb://LAPTOP-LSIQVUUQ/SGT-88IV");
 
-        $connector = new WindowsPrintConnector("smb://192.168.0.1/SGT-88IV");
+        // $connector = new WindowsPrintConnector("smb://192.168.0.1/SGT-88IV");
 
         // $connector = new NetworkPrintConnector("192.168.80.114", 9100);
         
@@ -256,14 +256,12 @@ class ReceiptPrinter
             // Print receipt title
             $this->printer->feed();
             $this->printer->setEmphasis(true);
-            $this->printer->text("RECEIPT\n");
+            $this->printer->text("TAX INVOICE\n");
             $this->printer->setEmphasis(false);
             $this->printer->setEmphasis(true);
             $this->printDashedLine();
             $this->printer->feed();
-
             $this->printer->setEmphasis(false);
-
             $this->printer->text($this->type);
             $this->printer->feed();
             $this->printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -294,7 +292,6 @@ class ReceiptPrinter
                 foreach ($this->items as $item) {
                     $this->printer->text($item);
                 }
-               
             }
             // Print subtotal
             $this->printer->setEmphasis(true);
@@ -334,7 +331,6 @@ class ReceiptPrinter
             // Cut the receipt
             $this->printer->cut();
             // $this->printer -> pulse();
-
             $this->printer->close();
         } else {
             throw new Exception('Printer has not been initialized.');

@@ -25,12 +25,8 @@
           <div class="card-header">
                 <h2 class="card-title"><b>Purchase History</b></h2>
                 <div class="card-tools">
-                  <div class="input-group input-group-sm" style="width: 150px;">
-                    <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
-                    <div class="input-group-append">
-                      <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
-                    </div>
-                  </div>
+                  <button type="button" class="btn btn-block btn-primary" data-toggle="modal" data-target="#exportModel" id="exportBtn">
+                  Export To Pdf</button>
                 </div>
               </div>
               <!-- /.card-header -->
@@ -49,11 +45,9 @@
                     </tr>
                   </thead>
                   <tbody>
-                  <!-- {{$i=0}} -->
-                  <!-- {{$i++}} -->
                     @foreach($history as $val)
                     <tr class="data-row">
-                      <td>{{$i}}</td>
+                      <td>{{$loop->iteration}}</td>
                       <td>{{$val->vendorName}}</td>
                       <td>{{$val->type}}</td>
                       <td>{{$val->amount}}</td>
@@ -100,15 +94,42 @@
   </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="exportModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form method="post" action="{{Route('printPurchaseHistory')}}">
+        @csrf
+          <div class="form-group">
+            <label>From Date</label>
+            <input type="date" name="from" class="form-control">   
+          </div>
+          <div class="form-group">
+            <label>To Date</label>
+            <input type="date" name="to" class="form-control">   
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" id="expBtn" class="btn btn-primary">Export</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script>
-
 $(document).on("click", "#delete", function () {
      var myBookId = $(this).data('id');
      $("#input_type").val( myBookId );
      // it is unnecessary to have to manually call the modal.
      // $('#addBookDialog').modal('show');
 });
+
+// $('#expBtn').click(function() {
+//      $("#exportModel").hide();
+// });
 
 </script>
 @endsection

@@ -5,18 +5,26 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use App\Models\RestSale;
 use Illuminate\Support\Facades\DB;
+use App\Models\CashDrawer;
+use App\Models\TakeAwaySale;
+use App\Models\TakeAwayItems;
+use App\Models\DeliverySaleItems;
+use App\Models\DeliverySale;
 
 class PaymentRest extends Component
 {
     public $billCode,$billAmount,$amount,$discount;
     public $payAmount,$returnAmount,$payStatus;
-    public $saleDataList;
+    public $saleDataList,$cashAmount;
 
     public function mount()
     {
         $this->saleDataList = RestSale::where('payment_status',0)
         ->select(DB::raw("CONCAT(bill_no,' (',sale_type,') ',' - ',total_amount,' DH') AS data"),'bill_no')
         ->get();
+
+        $this->cashAmount = CashDrawer::value('drawer_cash');
+        $this->cashAmount = number_format($this->cashAmount,2);
 
     }
 
@@ -42,7 +50,7 @@ class PaymentRest extends Component
             }
 
         $this->saleDataList = RestSale::where('payment_status',0)
-        ->select(DB::raw("CONCAT(bill_no,' (',sale_type,') ',' - ',total_amount,' DH') AS data"),'bill_no')
+        ->select(DB::raw("CONCAT(bill_no,' (',sale_type,') ',' - ',total_amount,' DH') AS data"),'bill_no','sale_type','table_no')
         ->get();
 
         return view('livewire.payment-rest');
@@ -103,6 +111,7 @@ class PaymentRest extends Component
 
     public function paymentMethod($method)
     {
+        $this->method = $method;
         $updateMethod = RestSale::where('barcode',$this->billCode)
         ->orWhere('bill_no',$this->billCode)
         ->update(['payment_method'=>$method]);
@@ -114,10 +123,39 @@ class PaymentRest extends Component
         ->orWhere('bill_no',$this->billCode)
         ->update(['payment_status'=>1]);
 
-        //when discount clicked
-        $total = RestSale::where('barcode',$this->billCode)
+        $method = RestSale::where('barcode',$this->billCode)
         ->orWhere('bill_no',$this->billCode)
-        ->value('total_amount');
+        ->value('payment_method');
+
+        $saleType = RestSale::where('barcode',$this->billCode)
+        ->orWhere('bill_no',$this->billCode)
+        ->value('sale_type');
+
+        if($saleType=='TAKE AWAY')
+        {
+            $delete = TakeAwaySale::where('token_no',$this->billCode)->delete();
+
+            $deleteItems = TakeAwayItems::where('token_no',$this->billCode)->delete();
+        }elseif($saleType=='DELIVERY')
+        {
+            $delete = DeliverySale::where('token_no',$this->billCode)->delete();
+
+            $deleteItems = DeliverySaleItems::where('token_no',$this->billCode)->delete();
+        }
+
+        if($method=='cash')
+        {
+            //update drawer cash
+            $pay = $this->payAmount;
+            $return = $this->returnAmount;
+            $balance = $pay - $return;
+            $update = CashDrawer::increment('drawer_cash',$balance);
+        
+            //when discount clicked
+            $total = RestSale::where('barcode',$this->billCode)
+            ->orWhere('bill_no',$this->billCode)
+            ->value('total_amount');
+        }
 
         $discount = RestSale::where('barcode',$this->billCode)
         ->orWhere('bill_no',$this->billCode)
@@ -179,9 +217,6 @@ class PaymentRest extends Component
             $this->billAmount = $totalPrice-$newPrice;
 
             $this->returnAmount = $this->payAmount - $this->billAmount;
-
-
-        }
-        
+        }        
     }
 }

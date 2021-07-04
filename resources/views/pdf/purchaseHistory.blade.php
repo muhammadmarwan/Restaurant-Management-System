@@ -38,7 +38,7 @@
                         <tr>
                             <td>
                                 <h2>
-                                    <span class="">Bank Reconciliation - {{$subAccount}}</span>
+                                    <span class="">Purchase Report</span>
                                 </h2>
                             </td>
                             <td class="text-right">
@@ -49,46 +49,46 @@
                 </div>
             </div>
             <br><br>
-            
             <br><br>
             <div class="row">
                 <div class="col-12 table-responsive">
                 <table class="table table-hover text-nowrap">
-                  <thead>
+                <thead>
                     <tr>
-                      <th width="4%">ID</th>
-                      <th>Date</th>
+                      <th>ID</th>
+                      <th>Vendor</th>
+                      <th>Type</th>
+                      <th>Invoice No</th>
                       <th>Bill No</th>
-                      <th>Description</th>
-                      <th width="5%">Debit</th>
-                      <th width="5%">Credit</th>
+                      <th width="20%">Due Date</th>
+                      <th>Amount</th>
                     </tr>
                   </thead>
-                    @foreach($result as $value)
-                    <tr>
+                  <tbody>
+                  <!-- {{$i=0}} -->
+                  <!-- {{$i++}} -->
+                    @foreach($history as $val)
+                    <tr class="data-row">
                       <td>{{$loop->iteration}}</td>
-                      <td>{{$value->date}}</td>
-                      <td>{{$value->bill_no}}</td>
-                      <td>{{$value->narration}}</td>
-                      <td>{{$value->debit}}</td>
-                      <td>{{$value->credit}}</td>
+                      <td>{{$val->vendorName}}</td>
+                      <td>{{$val->type}}</td>
+                      <td>{{$val->invoice_no}}</td>
+                      <td>{{$val->bill_no}}</td>
+                      <td>{{$val->due_date}}</td>
+                      <td>{{$val->amount}}</td>
                     </tr>
                     @endforeach
                     <tr>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td><b>Running Balance :</b></td>
-                      <td colspan="2"><b>{{$runningBalance}}</b></td>
+                      <th colspan="6" class="text-right">Total Amount</th>
+                      <td><strong>{{$total}}</strong></td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-                <!-- /.col -->
             </div>
             <br><br><br>
             <div>
-                <small><small>NOTE: This is system generated no need of signature</small></small>
+                <small><small>NOTE: This is system generate report no need of signature</small></small>
             </div>
         </div>
     </div>    

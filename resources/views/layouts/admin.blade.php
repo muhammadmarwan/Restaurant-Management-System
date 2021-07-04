@@ -270,6 +270,12 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="{{ Route('cashierChangeHistory') }}" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Cashier History</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{{ Route('salesMainReports') }}" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Sales Reports</p>

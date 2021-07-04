@@ -21,9 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SalarySetupTableSeeder::class);
         $this->call(UserPermissionTableSeeder::class); 
         $this->call(SubAccountsTableSeeder::class);
-
         $this->call(ProductUnitTableSeeder::class); 
-
         $this->call(ItemsSetupTableSeeder::class);         
     }
 }

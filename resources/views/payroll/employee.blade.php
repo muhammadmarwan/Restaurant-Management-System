@@ -173,14 +173,14 @@
               <div class="col-md-6">
               <div class="form-group">
                 <label>Basic Salary</label>
-                  <input type="number" name="basicSalary" class="form-control" id="exampleInputEmail1" placeholder="Enter Basic Salary">
+                  <input type="number" name="basicSalary" class="form-control text1" id="exampleInputEmail1" placeholder="Enter Basic Salary">
                   </select>
                 </div>
               </div> 
               <div class="col-md-6">
               <div class="form-group">
                 <label>Other Allowances</label>
-                  <input type="number" name="allowances" class="form-control" placeholder="Enter Allowances">
+                  <input type="number" name="allowances" class="form-control text2" placeholder="Enter Allowances">
                   </select>
                 </div>
               </div> 
@@ -189,7 +189,7 @@
               <div class="col-md-12">
               <div class="form-group">
                 <label>Salary</label>
-                  <input type="number" name="salary" class="form-control" placeholder="Enter Allowances">
+                  <input type="number" id="result" name="salary" class="form-control" placeholder="Salary">
                   </select>
                 </div>
               </div> 
@@ -207,7 +207,19 @@
 <script>
         $('#next').on("click", function(event) {
         $('#exampleModal1').modal( 'hide' );
-        
+        });
+
+        $(".text2").keyup(function(){
+          var val1 = +$(".text1").val();
+          var val2 = +$(".text2").val();
+          $("#result").val(val1+val2);
+        });
+
+        $(".text1").keyup(function(){
+          var val1 = +$(".text1").val();
+          var val2 = +$(".text2").val();
+          $("#result").val(val1+val2);
+          $("#result").prop("readonly", true);
         });
 </script>
 

@@ -96,10 +96,10 @@
     <a href="{{ Route('clearItemCart') }}"><button class="btn btn-outline-danger">Clear Cart</button></a>
     <button class="btn btn-outline-danger" data-toggle="modal" data-target="#latestSale">Latest Sales</button>
     <button class="btn btn-outline-danger" data-toggle="modal" data-target="#reports">Reports</button>
-    <!-- <button class="btn btn-outline-warning" data-toggle="modal" data-target="#debts">Clear Debts</button> -->
+    <button class="btn btn-outline-danger" data-toggle="modal" data-target="#debts">Clear Debts</button>
     <a href="{{ Route('drawerOpen') }}">
     <button class="btn btn-outline-danger">Drawer Open</button></a>
-    <a href="/salesRestaurant"><button class="btn btn-outline-danger">Refresh</button></a>
+    <!-- <a><button class="btn btn-outline-danger">Refresh</button></a> -->
     <button class="btn btn-outline-danger" data-toggle="modal" data-target="#saleClose">Close Sale</button>
     @if(Auth::user()->user_role==3)
     <a href="{{ Route('logout') }}"><button class="btn btn-outline-danger">Log Out</button></a>
@@ -120,6 +120,7 @@
           <th>Type</th>
           <th>Amount</th>
           <th>Payment Status</th>
+          <th>Action</th>
         </tr>
         @foreach($todaysSale as $sale)
         <tr>
@@ -132,6 +133,7 @@
           @else
           <td><p class="text-center" style="color:green"><b>PAID</b></p></td>
           @endif
+          <td><a href="{{Route('deleteSales',['id'=>$sale->transaction_id])}}"><button type="button" class="btn btn-danger btn-sm"><b>Remove</b></button></a></td>
         </tr>
         @endforeach
       </table>
@@ -333,7 +335,7 @@
         </button>
       </div>
       <div class="modal-body">
-      <form method="get" action="{{ Route('restaurantSaleClose') }}">
+      <form method="get" action="{{Route('printReport')}}">
       @csrf
       <div class="card-body">
         <div class="form-group">
@@ -346,10 +348,46 @@
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-success">Sale Close</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" data-toggle="modal" data-target="#cashierChange">Cashier Change</button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
       </div>
     </div>
     </form>
+  </div>
+</div>
+
+<!-- Modal for cashier change -->
+<div class="modal fade" id="cashierChange" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content bg-dark">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Transfer Cash</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <form method="post" action="{{ Route('cashierChange') }}">
+      @csrf
+        <div class="form-group">
+          <input type="number" class="form-control" name="amount" placeholder="Enter Drawer Amount">
+        </div>
+        <div class="form-group">
+          <label>Choose Parent Account</label>
+          <select class="form-control select2" style="width: 100%;" name="user">
+            <option selected disabled>Choose here</option>
+            @foreach($cashier as $value)
+            <option value="{{$value->user_id}}">{{$value->user_name}} - {{$value->user_id}}</option>
+            @endforeach
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-danger">Transfer Amount</button>
+      </div>
+      </form>
+    </div>
   </div>
 </div>
 

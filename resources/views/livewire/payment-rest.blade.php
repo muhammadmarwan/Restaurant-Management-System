@@ -2,7 +2,9 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3>Payment</h3>
-        <h1 style="color:green;"><b>{{$payStatus}}</b></h1>
+        <h1 style="color:green;">Drawer Cash : <b>{{$cashAmount}}</b></h1>
+        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" 
+        data-target="#updateCash">Update Cash</button>
       </div>
     <div class="modal-body">
     <div class="row">
@@ -11,9 +13,13 @@
         <div class="row">
             <select class="form-control text-center" name="tokenNumber" placeholder="Enter Token Number Or Barcode"
               wire:model="billCode">
-              <option selected >---------------------Select Bill----------------------------</option>
+              <option selected >---------------------------Select Bill----------------------------------</option>
             @foreach($saleDataList as $val)
+              @if($val->sale_type=='DINE IN')
+              <option label="{{$val->data}} (Table No : {{$val->table_no}})" value="{{$val->bill_no}}">
+              @else
               <option label="{{$val->data}}" value="{{$val->bill_no}}">
+              @endif
             @endforeach 
             </select>
         </div>
@@ -136,6 +142,30 @@
       </div>
       </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="updateCash" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Update Cash Drawer Amount</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="post" action="{{Route('cashUpdate')}}">
+      @csrf
+      <div class="modal-body">
+        <input type="number" name="cash" class="form-control" value="{{$cashAmount}}">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success">Save changes</button>
+      </div>
+      </form>
     </div>
   </div>
 </div>

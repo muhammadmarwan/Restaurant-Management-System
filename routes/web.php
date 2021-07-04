@@ -207,6 +207,9 @@ Route::group(['middleware' => ['auth']], function () {
     //dine table
     Route::get('/dineTableList', [App\Http\Controllers\SalesController::class, 'dineTableList'])->name('dineTableList');
     Route::post('/storeDineTable', [App\Http\Controllers\SalesController::class, 'storeDineTable'])->name('storeDineTable');
+    Route::post('/dineTableDelete', [App\Http\Controllers\SalesController::class, 'dineTableDelete'])->name('dineTableDelete');
+
+   
     Route::get('/storeDineOrder/{id}', [App\Http\Controllers\SalesController::class, 'storeDineOrder'])->name('storeDineOrder');
     Route::get('/customerInvoicePrint', [App\Http\Controllers\SalesController::class, 'customerInvoicePrint'])->name('customerInvoicePrint');
 
@@ -299,6 +302,15 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/printBill', [App\Http\Controllers\ReceiptController::class, 'printBill'])->name('printBill');
 
     Route::get('/viewTradingAccount', [App\Http\Controllers\TradingAccountController::class, 'viewTradingAccount'])->name('viewTradingAccount');
+    Route::post('/cashierChange', [App\Http\Controllers\SalesController::class, 'cashierChange'])->name('cashierChange');
+    Route::get('/cashierChangeHistory', [App\Http\Controllers\SalesController::class, 'cashierChangeHistory'])->name('cashierChangeHistory');
+    Route::post('/printPurchaseHistory', [App\Http\Controllers\PurchaseController::class, 'printPurchaseHistory'])->name('printPurchaseHistory');
+
+    Route::post('/cashUpdate', [App\Http\Controllers\ReceiptController::class, 'cashUpdate'])->name('cashUpdate');
+
+    Route::get('/printReport', [App\Http\Controllers\ReceiptController::class, 'printReport'])->name('printReport');
+    Route::get('/deleteSales', [App\Http\Controllers\ReceiptController::class, 'deleteSales'])->name('deleteSales');
+
 });
     
 // Route::get('/mailSend', [App\Http\Controllers\AuthController::class, 'forgetPassword'])->name('forgetPassword');

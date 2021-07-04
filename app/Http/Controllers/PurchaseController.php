@@ -562,7 +562,7 @@ class PurchaseController extends Controller
         ->where('degree',AccountType::Normal)
         ->get();
 
-        $count = PurchaseSetup::where('id',1)->count();
+        $count = PurchaseSetup::where('id',1)->value('account_id');
 
         return view('purchase.purchaseSetup',['name'=>$name,'accounts'=>$accounts,'count'=>$count]);
     }
@@ -697,5 +697,51 @@ class PurchaseController extends Controller
 
         Alert::success('Success','Purchase Entry Deleted Successfully');
         return redirect()->back();
+    }
+
+    public function printPurchaseHistory(Request $request)
+    {
+        $fromDate = date('Y-m-d', strtotime($request->from)) . ' 00:00:00';
+        $toDate = date('Y-m-d', strtotime($request->to)) . ' 23:59:59';
+
+        $purchase = PurchaseEntry::leftjoin('vendors','vendors.transaction_id','purchase_entries.vendor_id')
+        ->select('vendors.name as vendorName','purchase_entries.*')
+        ->whereBetween('purchase_entries.created_at', [$fromDate, $toDate])
+        ->get();
+
+        $inventory = PurchaseInventoryOrder::leftjoin('vendors','vendors.transaction_id','purchase_inventory_orders.vendor_id')
+        ->select('vendors.name as vendorName','purchase_inventory_orders.*','purchase_inventory_orders.total_amount as amount')
+        ->whereBetween('purchase_inventory_orders.created_at', [$fromDate, $toDate])
+        ->get();
+
+        $array = [];
+        $totalPurchase = 0;
+        $totalInventory = 0;
+        
+        foreach($purchase as $val)
+        { 
+            $val->type = 'Normal';
+
+            array_push($array,$val);
+            
+            $totalPurchase += $val->amount;
+        }
+        
+        foreach($inventory as $val)
+        {
+            $val->type = 'Inventory';
+        
+            array_push($array,$val);
+
+            $totalInventory += $val->amount;
+        }
+
+        $total = $totalPurchase + $totalInventory;
+
+        $today = Carbon::now()->format('d-F-Y');
+
+        $pdf = PDF::loadView('pdf.purchaseHistory',['today'=>$today,'history'=>$array,'total'=>$total]);
+        //  download PDF file with download method
+        return $pdf->download('PurchaseHistory.pdf');
     }
 }

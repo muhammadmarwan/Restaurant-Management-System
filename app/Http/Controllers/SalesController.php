@@ -40,6 +40,8 @@ use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use RealRashid\SweetAlert\Facades\Alert;
+use App\Models\User;
+use App\Models\CashierChange;
 
 class SalesController extends Controller
 {
@@ -374,6 +376,7 @@ class SalesController extends Controller
         }
     }
 
+
     public function dailySaleClose(Request $request)
     {
         $saleCloseStatus = Order::where('close_status', SaleCloseStatus::pending)->count();
@@ -435,7 +438,7 @@ class SalesController extends Controller
         }
         return redirect()->back();
     }
-
+//----------------restaurant based code starts from here----------------------------
     public function salesRestaurant()
     {
         $name = Auth::user()->user_name;
@@ -447,7 +450,8 @@ class SalesController extends Controller
                 'sale_type',
                 'total_amount',
                 DB::raw('DATE_FORMAT(created_at, "%H:%i:%s") as time'),
-                'payment_status'
+                'payment_status',
+                'transaction_id'
             )
             ->latest()->get();
 
@@ -474,8 +478,11 @@ class SalesController extends Controller
         $deliveryList = DeliverySale::latest()->where('status', 0)
             ->where('created_at', '>', Carbon::now()->subHours(4)->toDateTimeString())->get();
 
+        $cashier = User::where('user_role',3) 
+        ->where('user_id','!=',Auth::user()->user_id)->get();    
+
         return view('sales.salesRestaurant', [
-            'name' => $name, 'todaysSale' => $todaysSale, 'table' => $table,
+            'name' => $name, 'todaysSale' => $todaysSale, 'table' => $table,'cashier' => $cashier,
             'takeAway' => $takeAway, 'delivery' => $deliveryList, 'total' => $totalSale, 'pendingSale' => $pendingSale
         ]);
     }
@@ -498,7 +505,8 @@ class SalesController extends Controller
         $storeSale->bill_no = mt_rand(1000, 9999);;
         $storeSale->total_amount = $priceTotal;
         $storeSale->sale_type = $cart->sale_type;
-        $storeSale->barcode = mt_rand(1000000, 9999999);;
+        $storeSale->barcode = mt_rand(1000000, 9999999);
+        $storeSale->auth_user = Auth::user()->user_id;
         $storeSale->save();
 
         $listItems = ItemsCart::all();
@@ -526,6 +534,14 @@ class SalesController extends Controller
         $tables = DineInTable::all();
 
         return view('sales.dineTable', ['name' => $name, 'tables' => $tables]);
+    }
+
+    public function dineTableDelete(Request $request)
+    {
+        $tables = DineInTable::where('id',$request->id)->delete();
+
+        Alert::success('Success', 'Table Deleted Successfully');
+        return redirect()->back();
     }
 
     public function storeDineTable(Request $request)
@@ -771,7 +787,8 @@ class SalesController extends Controller
         $storeSale->total_amount = $totalPrice->total_amount;
         $storeSale->sale_type = 'TAKE AWAY';
         $storeSale->sale_type_id = $totalPrice->transaction_id;
-        $storeSale->barcode = mt_rand(1000000, 9999999);;
+        $storeSale->barcode = mt_rand(1000000, 9999999);
+        $storeSale->auth_user = Auth::user()->user_id;
         $storeSale->save();
 
         $listItems = TakeAwayItems::where('take_away_items.token_no', $request->id)
@@ -822,6 +839,7 @@ class SalesController extends Controller
         $storeSale->sale_type_id = $dineInTable;
         $storeSale->table_no = $request->id;
         $storeSale->barcode = mt_rand(1000000, 9999999);
+        $storeSale->auth_user = Auth::user()->user_id;
         $storeSale->save();
 
         $listItems = DineInTableItems::leftjoin('items', 'items.transaction_id', 'dine_in_table_items.item_id')
@@ -845,10 +863,11 @@ class SalesController extends Controller
         $sum = RestSaleItem::where('sale_id', $storeSale->transaction_id)
             ->sum('total_amount');
 
-        $updateTotalPrice = RestSale::where('status', 0)->update(['total_amount' => $sum]);
+        $updateTotalPrice = RestSale::where('transaction_id',$storeSale->transaction_id)
+        ->update(['total_amount'=>$sum]);
 
         $updateEngageStatus = DineInTable::where('table_no', $request->id)
-            ->update(['engaged_status' => 0]);
+            ->update(['engaged_status'=>0]);
 
         $truncate = DineInTableItems::truncate();
         
@@ -884,7 +903,8 @@ class SalesController extends Controller
         $storeSale->total_amount = $totalPrice->total_price;
         $storeSale->sale_type = 'DELIVERY';
         $storeSale->sale_type_id = $totalPrice->transaction_id;
-        $storeSale->barcode = mt_rand(1000000, 9999999);;
+        $storeSale->barcode = mt_rand(1000000, 9999999);
+        $storeSale->auth_user = Auth::user()->user_id;
         $storeSale->save();
 
         $listItems = DeliverySaleItems::where('delivery_sale_items.token_no',$request->tokenNo)
@@ -922,20 +942,26 @@ class SalesController extends Controller
                 'rest_sales.*'
             )
                 ->whereDay('created_at', now()->day)
+                ->where('payment_status',1)
                 ->latest()->get();
 
             foreach ($dailyReport as $value) {
                 if ($value->total_amount >= 5) {
                     $total = $value->total_amount;
 
+                    $value->total_amount = number_format($value->total_amount,2);
+
                     $percentage = (5 / 100) * $total;
 
                     $value->percentage = $percentage;
+                    $value->percentage = number_format($value->percentage,2);
 
                     $value->revenue = $total - $percentage;
+                    $value->revenue = number_format($value->revenue,2);
 
                     $totalPercentage += $value->percentage;
                     $totalRevenue += $value->revenue;
+
                 } else {
                     $value->percentage = 0;
 
@@ -948,7 +974,15 @@ class SalesController extends Controller
 
             $today = Carbon::now()->format('d-F-Y');
 
-            $totalSale = $dailyReport->sum('total_amount');
+            $totalSale1 = $dailyReport->sum('total_amount');
+            
+            $totalPercentage1 = $dailyReport->sum('percentage');
+            $totalRevenue1 = $dailyReport->sum('revenue');
+
+            $totalSale = number_format($totalSale1,2);
+            $totalPercentage = number_format($totalPercentage1,2);
+            $totalRevenue = number_format($totalRevenue1,2);
+
 
             $pdf = PDF::loadView('sales.restaurantSalesReport', [
                 'today' => $today, 'total' => $totalSale,
@@ -967,33 +1001,41 @@ class SalesController extends Controller
                 'rest_sales.*'
             )
                 ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+                ->where('payment_status',1)
                 ->latest()->get();
 
             foreach ($weeklyReport as $value) {
                 if ($value->total_amount >= 5) {
                     $total = $value->total_amount;
 
+                    $value->total_amount = number_format($value->total_amount,2);
+
                     $percentage = (5 / 100) * $total;
 
                     $value->percentage = $percentage;
+                    $value->percentage = number_format($value->percentage,2);
 
                     $value->revenue = $total - $percentage;
+                    $value->revenue = number_format($value->revenue,2);
 
-                    $totalPercentage += $value->percentage;
-                    $totalRevenue += $value->revenue;
                 } else {
                     $value->percentage = 0;
 
                     $value->revenue = $value->total_amount;
 
-                    $totalPercentage += $value->percentage;
-                    $totalRevenue += $value->revenue;
                 }
             }
 
             $today = Carbon::now()->format('d-F-Y');
 
-            $totalSale = $weeklyReport->sum('total_amount');
+            $totalSale1 = $weeklyReport->sum('total_amount');
+            
+            $totalPercentage1 = $weeklyReport->sum('percentage');
+            $totalRevenue1 = $weeklyReport->sum('revenue');
+
+            $totalSale = number_format($totalSale1,2);
+            $totalPercentage = number_format($totalPercentage1,2);
+            $totalRevenue = number_format($totalRevenue1,2);
 
             $pdf = PDF::loadView('sales.restaurantSalesReport', [
                 'today' => $today, 'total' => $totalSale,
@@ -1012,33 +1054,43 @@ class SalesController extends Controller
                 'rest_sales.*'
             )
                 ->whereMonth('created_at', Carbon::now()->month)
+                ->where('payment_status',1)
                 ->latest()->get();
 
             foreach ($monthlyReport as $value) {
                 if ($value->total_amount >= 5) {
                     $total = $value->total_amount;
 
+                    $value->total_amount = number_format($value->total_amount,2);
+
                     $percentage = (5 / 100) * $total;
 
                     $value->percentage = $percentage;
+                    $value->percentage = number_format($value->percentage,2);
 
                     $value->revenue = $total - $percentage;
+                    $value->revenue = number_format($value->revenue,2);
 
-                    $totalPercentage += $value->percentage;
-                    $totalRevenue += $value->revenue;
+
                 } else {
                     $value->percentage = 0;
 
                     $value->revenue = $value->total_amount;
 
-                    $totalPercentage += $value->percentage;
-                    $totalRevenue += $value->revenue;
                 }
             }
 
             $today = Carbon::now()->format('d-F-Y');
 
-            $totalSale = $monthlyReport->sum('total_amount');
+            $totalSale1 = $monthlyReport->sum('total_amount');
+
+
+            $totalPercentage1 = $monthlyReport->sum('percentage');
+            $totalRevenue1 = $monthlyReport->sum('revenue');
+
+            $totalSale = number_format($totalSale1,2);
+            $totalPercentage = number_format($totalPercentage1,2);
+            $totalRevenue = number_format($totalRevenue1,2);
 
             $pdf = PDF::loadView('sales.restaurantSalesReport', [
                 'today' => $today, 'total' => $totalSale,
@@ -1062,33 +1114,41 @@ class SalesController extends Controller
                 'rest_sales.*'
             )
                 ->whereBetween('created_at', [$fromDate, $toDate])
+                ->where('payment_status',1)
                 ->latest()->get();
 
             foreach ($report as $value) {
                 if ($value->total_amount >= 5) {
                     $total = $value->total_amount;
 
+                    $value->total_amount = number_format($value->total_amount,2);
+
                     $percentage = (5 / 100) * $total;
 
                     $value->percentage = $percentage;
+                    $value->percentage = number_format($value->percentage,2);
 
                     $value->revenue = $total - $percentage;
+                    $value->revenue = number_format($value->revenue,2);
 
-                    $totalPercentage += $value->percentage;
-                    $totalRevenue += $value->revenue;
                 } else {
                     $value->percentage = 0;
 
                     $value->revenue = $value->total_amount;
 
-                    $totalPercentage += $value->percentage;
-                    $totalRevenue += $value->revenue;
                 }
             }
 
             $today = Carbon::now()->format('d-F-Y');
 
-            $totalSale = $report->sum('total_amount');
+            $totalSale1 = $report->sum('total_amount');
+            
+            $totalPercentage1 = $report->sum('percentage');
+            $totalRevenue1 = $report->sum('revenue');
+
+            $totalSale = number_format($totalSale1,2);
+            $totalPercentage = number_format($totalPercentage1,2);
+            $totalRevenue = number_format($totalRevenue1,2);
 
             $pdf = PDF::loadView('sales.restaurantSalesReport', [
                 'today' => $today, 'total' => $totalSale,
@@ -1312,5 +1372,29 @@ class SalesController extends Controller
         $printer->close();
 
         return redirect()->back();
+    }
+
+    public function cashierChange(Request $request)
+    {
+        $cashierChange = new CashierChange();
+        $cashierChange->transaction_id = Transaction::setTransactionId();
+        $cashierChange->from_cashier = Auth::user()->user_id;
+        $cashierChange->to_cashier = $request->user;
+        $cashierChange->amount = $request->amount;
+        $cashierChange->save();
+
+        return redirect()->back();
+    }
+
+    public function cashierChangeHistory(Request $request)
+    {
+        $name = Auth::user()->user_name;
+        $cashierChange = CashierChange::leftjoin('users as user1','user1.user_id','cashier_changes.from_cashier')
+        ->leftjoin('users as user2','user2.user_id','cashier_changes.to_cashier')
+        ->select(DB::raw('DATE_FORMAT(cashier_changes.created_at, "%d-%m-%Y") as date'),
+        DB::raw('DATE_FORMAT(cashier_changes.created_at, "%H:%i:%s") as time'),'cashier_changes.amount',
+        'user1.user_name as fromUser','user2.user_name as toUser')->get();
+               
+        return view('sales.cashierHistory',['name'=>$name,'cashierChange'=>$cashierChange]);
     }
 }

@@ -29,5 +29,11 @@ class SalarySetupTableSeeder extends Seeder
                 'account_type' => 'Purchase Tax Account',
             ], 
         ]);
+        \Illuminate\Support\Facades\DB::table('cash_drawers')->insert([
+            [
+                'transaction_id' => \App\TransactionId\Transaction::setTransactionId(),
+                'drawer_cash' => 0,
+            ], 
+        ]);
     }
 }

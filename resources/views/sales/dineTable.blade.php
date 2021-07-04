@@ -16,7 +16,7 @@
         <div class="card-body">
         <div class="row">
         @foreach($tables as $val)
-          <div class="col-sm-2 m-2" id="demo" data-id="{{$val->table_no}}">
+          <div class="col-sm-2 m-2 deleteButton" id="demo" data-id="{{$val->id}}" data-toggle="modal" data-target="#deleteModel">
             <div class="card card-body card-sm bg-danger itemCard" style="width: 8rem;" wire:click="SalesType('TAKE AWAY')">
                 <h4>{{$val->table_no}}</h4>
                 <br>
@@ -65,4 +65,33 @@
   </div>
 </div>
 
+<!-- Modal For Delete -->
+<div class="modal fade" id="deleteModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <form method="post" action="{{ Route('dineTableDelete') }}"> 
+        @csrf
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          <input type="hidden" name="id" class="form-control" id="input_type" value="" readonly>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+    $(".deleteButton").click(function () {
+    var ids = $(this).attr('data-id');
+    $("#input_type").val( ids );
+    $('#setupCashModel').modal('show');
+    });
+</script>
 @endsection

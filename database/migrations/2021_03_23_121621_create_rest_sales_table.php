@@ -28,6 +28,7 @@ class CreateRestSalesTable extends Migration
             $table->string('discount')->default(0);
             $table->string('payment_status')->default(0);
             $table->string('close_status')->default(0);
+            $table->string('auth_user');
             $table->string('status')->default(0);
             $table->timestamps();
         });

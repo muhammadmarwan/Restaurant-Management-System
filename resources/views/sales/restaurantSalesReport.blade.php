@@ -19,10 +19,11 @@
         .billing-company-image { width: 50px; }
         .billing_name { text-transform: uppercase; }
         .billing_address { text-transform: capitalize; }
-        .table{ width: 100%; border-collapse: collapse; }
+        .table{ width: 100%; border-collapse: collapse;}
         th{ text-align: left; padding: 10px; }
-        td{ padding: 10px; vertical-align: top; }
-        .row{ display: block; clear: both; }
+        td{ padding: 10px; vertical-align: top;}
+        .tb1{ border: 1px solid #dddddd; }
+        .row{ display: block; clear: both;  }
         .text-right{ text-align: right; }
         .table-hover thead tr{ background: #eee; }
         .table-hover tbody tr:nth-child(even){ background: #fbf9f9; }
@@ -63,32 +64,34 @@
                     <table class="table table-condensed table-hover">
                         <thead>
                             <tr>
-                                <th>Qty</th>
-                                <th>Time</th>
-                                <th width="20%">Date</th>                      
-                                <th>Bill No</th>
-                                <th>Tax(5%)</th>
-                                <th>Revenue</th>
-                                <th>Total Amount</th>
+                                <th class="tb1">Qty</th>
+                                <th class="tb1">Time</th>
+                                <th width="17%" class="tb1">Date</th>                      
+                                <th class="tb1">Bill No</th>
+                                <th class="tb1">Cashier Id</th>
+                                <th class="tb1">Tax(5%)</th>
+                                <th class="tb1">Revenue</th>
+                                <th class="tb1" width="20%">Total</th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach($report as $value)
                             <tr>
-                                <td>{{$loop->iteration}}</td>
-                                <td>{{$value->time}}</td>
-                                <td>{{$value->date}}</td>
-                                <td>{{$value->bill_no}}</td>
-                                <td>{{$value->percentage}}</td>
-                                <td>{{$value->revenue}}</td>
-                                <td>{{$value->total_amount}}</td>
+                                <td class="tb1">{{$loop->iteration}}</td>
+                                <td class="tb1">{{$value->time}}</td>
+                                <td class="tb1">{{$value->date}}</td>
+                                <td class="tb1">{{$value->bill_no}}</td>
+                                <td class="tb1">{{$value->auth_user}}</td>
+                                <td class="tb1">{{$value->percentage}}</td>
+                                <td class="tb1">{{$value->revenue}}</td>
+                                <td class="tb1">{{$value->total_amount}}</td>
                             </tr>
                         @endforeach    
-                            <tr>
-                                <th colspan="4" class="text-right">Total</th>
-                                <td><strong>{{$totalPercentage}}</strong></td>
-                                <td><strong>{{$totalRevenue}}</strong></td>
-                                <td><strong>{{$total}}</strong></td>
+                            <tr class="text-center">
+                                <th colspan="5" class="text-right tb1">Total(AED)</th>
+                                <td class="tb1"><strong>{{$totalPercentage}}</strong></td>
+                                <td class="tb1"><strong>{{$totalRevenue}}</strong></td>
+                                <td class="tb1"><strong>{{$total}}</strong></td>
                             </tr>
                         </tbody>
                     </table>
